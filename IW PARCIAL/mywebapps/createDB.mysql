@@ -1,0 +1,97 @@
+CREATE DATABASE IF NOT EXISTS petclinic;
+
+USE petclinic;
+
+GRANT ALL PRIVILEGES ON *.* TO 'pc'@'%' IDENTIFIED BY 'pc';
+FLUSH PRIVILEGES; 
+
+DROP TABLE IF EXISTS visits;
+DROP TABLE IF EXISTS pets;
+DROP TABLE IF EXISTS owners;
+DROP TABLE IF EXISTS types;
+DROP TABLE IF EXISTS vet_specialties;
+DROP TABLE IF EXISTS specialties;
+DROP TABLE IF EXISTS vets;
+
+
+CREATE TABLE vets (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(30),
+  last_name VARCHAR(30),
+  INDEX(last_name)
+) ENGINE=InnoDB;
+
+CREATE TABLE specialties (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(80),
+  INDEX(name)
+) ENGINE=InnoDB;
+
+CREATE TABLE vet_specialties (
+  vet_id INT(4) UNSIGNED NOT NULL,
+  specialty_id INT(4) UNSIGNED NOT NULL,
+  PRIMARY KEY (vet_id, specialty_id)
+) ENGINE=InnoDB;
+
+ALTER TABLE vet_specialties ADD CONSTRAINT fk_vet_specialties_vets FOREIGN KEY (vet_id) REFERENCES vets(id);
+ALTER TABLE vet_specialties ADD CONSTRAINT fk_vet_specialties_specialties FOREIGN KEY (specialty_id) REFERENCES specialties(id);
+
+CREATE TABLE types (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(80),
+  INDEX(name)
+) ENGINE=InnoDB;
+
+CREATE TABLE owners (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  first_name VARCHAR(30),
+  last_name VARCHAR(30),
+  address VARCHAR(255),
+  city VARCHAR(80),
+  telephone VARCHAR(20),
+  INDEX(last_name)
+) ENGINE=InnoDB;
+
+CREATE TABLE pets (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  name VARCHAR(30),
+  birth_date DATE,
+  type_id INT(4) UNSIGNED NOT NULL,
+  owner_id INT(4) UNSIGNED NOT NULL,
+  INDEX(name),
+  FOREIGN KEY (type_id) REFERENCES types(id),
+  FOREIGN KEY (owner_id) REFERENCES owners(id)
+) ENGINE=InnoDB;
+
+CREATE TABLE visits (
+  id INT(4) UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  pet_id INT(4) UNSIGNED NOT NULL,
+  pet_owner_id INT(4) UNSIGNED NOT NULL,
+  visit_date DATE,
+  description VARCHAR(255),
+  INDEX(pet_id),
+  FOREIGN KEY (pet_id) REFERENCES pets(id)
+) ENGINE=InnoDB;
+
+-- Insertar un veterinario
+INSERT INTO vets (first_name, last_name) VALUES ('James', 'Carter');
+
+-- Insertar una especialidad
+INSERT INTO specialties (name) VALUES ('radiology');
+
+-- Insertar una relación entre veterinario y especialidad
+INSERT INTO vet_specialties (vet_id, specialty_id) VALUES (1, 1);
+
+-- Insertar un tipo de mascota
+INSERT INTO types (name) VALUES ('cat');
+
+-- Insertar un dueño de mascota
+INSERT INTO owners (first_name, last_name, address, city, telephone) VALUES ('George', 'Franklin', '110 W. Liberty St.', 'Madison', '6085551023');
+
+-- Insertar una mascota
+INSERT INTO pets (name, birth_date, type_id, owner_id) VALUES ('Leo', '2000-09-07', 1, 1);
+
+-- Insertar una visita a la mascota
+INSERT INTO visits (pet_id, pet_owner_id, visit_date, description) VALUES (1, 1, '2024-05-15', 'rabies shot');
+
+

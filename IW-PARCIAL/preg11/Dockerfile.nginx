@@ -1,0 +1,11 @@
+# Usar una imagen de Nginx
+FROM nginx:1.19.2-alpine
+
+# Copiar la configuración de Nginx
+COPY default.conf /etc/nginx/conf.d/
+
+# Exponer el puerto 8089
+EXPOSE 8089
+
+# Iniciar Nginx
+CMD ["nginx", "-g", "daemon off;"]

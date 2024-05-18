@@ -1,0 +1,32 @@
+version: '3.8'  # Versión de la sintaxis de Docker Compose
+
+services:  # Define los servicios que componen tu aplicación
+  web:  # Nombre del primer servicio
+    build: .  # Ubicación del Dockerfile (en este caso, el directorio actual)
+    container_name: iw_parcial_pregunta10  # Nombre del contenedor para este servicio
+    ports:  # Mapeo de puertos entre el contenedor y el host
+      - "8089:80"  # Mapea el puerto 8089 del host al puerto 80 del contenedor
+    depends_on:  # Define las dependencias de este servicio
+      - db  # Este servicio depende del servicio 'db'
+
+  db:  # Nombre del segundo servicio
+    image: mysql:5.7  # Imagen Docker a usar para este servicio
+    container_name: iw_parcial_db  # Nombre del contenedor para este servicio
+    environment:  # Variables de entorno para el contenedor
+      MYSQL_ROOT_PASSWORD: rootpassword  # Contraseña del usuario root de MySQL
+      MYSQL_DATABASE: petclinic  # Nombre de la base de datos a crear
+      MYSQL_USER: pc  # Nombre de usuario de MySQL
+      MYSQL_PASSWORD: pc  # Contraseña del usuario de MySQL
+    volumes:  # Volumenes para persistir datos y ejecutar scripts
+      - db_data:/var/lib/mysql  # Persiste los datos de la base de datos
+      - ./createDB.sql:/docker-entrypoint-initdb.d/createDB.sql  # Ejecuta el script SQL en el inicio del contenedor
+    ports:  # Mapeo de puertos entre el contenedor y el host
+      - "3306:3306"  # Mapea el puerto 3306 del host al puerto 3306 del contenedor
+    healthcheck:  # Configura un control de salud para el contenedor
+      test: ["CMD", "mysqladmin", "ping", "--silent"]  # Comando para verificar la salud del contenedor
+      interval: 30s  # Intervalo entre verificaciones de salud
+      timeout: 10s  # Tiempo de espera antes de considerar fallida una verificación de salud
+      retries: 5  # Número de reintentos antes de considerar no saludable al contenedor
+
+volumes:  # Define los volúmenes utilizados por los servicios
+  db_data:  # Nombre del volumen para persistir los datos de la base de datos
